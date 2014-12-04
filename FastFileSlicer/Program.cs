@@ -24,8 +24,8 @@ namespace FastFileSlicer
             try
             {
                 string fileName = ReadFileName (args);
-
-                FilePortionReader fpr = new FilePortionReader(fileName, 0, -1, '\t');
+                FileStreamSeekManager fileStreamSeekManager = new FileStreamSeekManager(0);
+                FilePortionReader fpr = new FilePortionReader(fileName, fileStreamSeekManager, -1, '\t');
                 fpr.Read();
 
                 return;

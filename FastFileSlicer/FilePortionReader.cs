@@ -7,15 +7,15 @@ namespace FastFileSlicer
     internal class FilePortionReader : FileReaderBase
     {
         private readonly string fullFileNamePath;
-        private readonly long startByte;
+        private readonly FileStreamSeekManager fileStreamSeekManager;
         private readonly long endByte;
         private readonly char columnSeparator;
         private byte[] buffer;
 
-        public FilePortionReader (string fullFileNamePath, long startByte, long endByte, char columnSeparator)
+        public FilePortionReader (string fullFileNamePath, FileStreamSeekManager fileStreamSeekManager, long endByte, char columnSeparator)
         {
             this.fullFileNamePath = fullFileNamePath;
-            this.startByte = startByte;
+            this.fileStreamSeekManager = fileStreamSeekManager;
             this.endByte = endByte;
             this.columnSeparator = columnSeparator;
         }
@@ -31,8 +31,7 @@ namespace FastFileSlicer
 
         private void SeekFileStream(FileStream fileStream)
         {
-            FileStreamSeekManager fssm = new FileStreamSeekManager(fileStream, this.startByte);
-            fssm.Seek();
+            this.fileStreamSeekManager.Seek(fileStream);
         }
 
         private void StartSlicing(FileStream fileStream)

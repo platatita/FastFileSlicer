@@ -31,8 +31,8 @@ namespace FastFileSlicer.UnitTests
         public void Does_Not_Change_FileStream_Position_When_StartByte_Equals_To_Zero()
         {
             long startByte = 0;
-            this.target = new FileStreamSeekManager(this.fileStream, startByte);
-            var actual = this.target.Seek();
+            this.target = new FileStreamSeekManager(startByte);
+            var actual = this.target.Seek(this.fileStream);
 
             Assert.IsFalse(actual);
             Assert.AreEqual(0, this.fileStream.Position);
@@ -42,8 +42,8 @@ namespace FastFileSlicer.UnitTests
         public void Does_Not_Change_FileStream_Position_When_File_Is_Empty()
         {
             long startByte = 100;
-            this.target = new FileStreamSeekManager(this.fileStream, startByte);
-            var actual = this.target.Seek();
+            this.target = new FileStreamSeekManager(startByte);
+            var actual = this.target.Seek(this.fileStream);
 
             Assert.IsFalse(actual);
             Assert.AreEqual(0, this.fileStream.Position);
@@ -55,8 +55,8 @@ namespace FastFileSlicer.UnitTests
             WriteLines(5);
 
             long startByte = 7;
-            this.target = new FileStreamSeekManager(this.fileStream, startByte);
-            var actual = this.target.Seek();
+            this.target = new FileStreamSeekManager(startByte);
+            var actual = this.target.Seek(this.fileStream);
 
             Assert.IsTrue(actual);
             Assert.AreEqual(19, this.fileStream.Position);
@@ -68,8 +68,8 @@ namespace FastFileSlicer.UnitTests
             WriteLines(5);
 
             long startByte = 65;
-            this.target = new FileStreamSeekManager(this.fileStream, startByte);
-            var actual = this.target.Seek();
+            this.target = new FileStreamSeekManager(startByte);
+            var actual = this.target.Seek(this.fileStream);
 
             Assert.IsTrue(actual);
             Assert.AreEqual(79, this.fileStream.Position);
@@ -81,8 +81,8 @@ namespace FastFileSlicer.UnitTests
             WriteLines(5);
 
             long startByte = 95;
-            this.target = new FileStreamSeekManager(this.fileStream, startByte);
-            var actual = this.target.Seek();
+            this.target = new FileStreamSeekManager(startByte);
+            var actual = this.target.Seek(this.fileStream);
 
             Assert.IsTrue(actual);
             Assert.AreEqual(99, this.fileStream.Position);

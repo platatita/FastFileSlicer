@@ -6,39 +6,37 @@ namespace FastFileSlicer
     internal class FileStreamSeekManager : FileReaderBase
     {
         private const int BytesToRead = 16;
-        private readonly FileStream fileStream;
         private readonly long startByte;
-        private bool seekResult;
 
-        public FileStreamSeekManager(FileStream fileStream, long startByte)
+        public FileStreamSeekManager(long startByte)
         {
-            this.fileStream = fileStream;
             this.startByte = startByte;
         }
 
-        public bool Seek()
+        public bool Seek(FileStream fileStream)
         {
-            this.seekResult = false;
+            bool seekResult = false;
             
-            if (startByte > 0 && this.startByte < this.fileStream.Length)
+            if (startByte > 0 && this.startByte < fileStream.Length)
             {
-                SeekFileStreamToStartByte();
-                SeekFileStreamToNextLine();
+                SeekFileStreamToStartByte(fileStream);
+
+                seekResult = SeekFileStreamToNextLine(fileStream);
             }
 
-            return this.seekResult;
+            return seekResult;
         }
 
-        private void SeekFileStreamToStartByte()
+        private void SeekFileStreamToStartByte(FileStream fileStream)
         {
-            this.fileStream.Seek(startByte, SeekOrigin.Begin);
+            fileStream.Seek(startByte, SeekOrigin.Begin);
         }
 
-        private void SeekFileStreamToNextLine()
+        private bool SeekFileStreamToNextLine(FileStream fileStream)
         {
             do
             {
-                int readBytes = base.Read(this.fileStream, BytesToRead);
+                int readBytes = base.Read(fileStream, BytesToRead);
                 if (readBytes <= 0)
                 {
                     break;
@@ -48,12 +46,13 @@ namespace FastFileSlicer
                 if (findCharIndex > 0)
                 {
                     long newPosition = findCharIndex - readBytes;
-                    this.fileStream.Seek(newPosition, SeekOrigin.Current);
-                    this.seekResult = true;
-                    break;
+                    fileStream.Seek(newPosition, SeekOrigin.Current);
+                    return true;
                 }
 
             } while(true);
+
+            return false;
         }
     }
 }
