@@ -38,16 +38,40 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FilePortionReaderTests.cs" />
-    <Compile Include="FileStreamSeekManagerTests.cs" />
+    <Compile Include="Helpers\DirectoryHelper.cs" />
+    <Compile Include="FileStreamPositionManagerTests.cs" />
+    <Compile Include="StreamReaderTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Integrations\Test1\file_to_slice.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Integrations\Test1\Expected\column1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Integrations\Test2\Expected\column1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Integrations\Test2\file_to_slice.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Integrations\Test2\Expected\column12.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FastFileSlicer\FastFileSlicer.csproj">
       <Project>{EC85BD1D-36E5-4C76-8604-16F466E2E335}</Project>
       <Name>FastFileSlicer</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Integrations\" />
+    <Folder Include="Integrations\Test1\" />
+    <Folder Include="Integrations\Test1\Expected\" />
+    <Folder Include="Helpers\" />
+    <Folder Include="bin\Debug\" />
   </ItemGroup>
 </Project>

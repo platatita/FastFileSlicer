@@ -38,8 +38,10 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FilePortionReader.cs" />
-    <Compile Include="FileStreamSeekManager.cs" />
-    <Compile Include="FileReaderBase.cs" />
+    <Compile Include="FileStreamPositionManager.cs" />
+    <Compile Include="SliceFileNameManager.cs" />
+    <Compile Include="StreamReader.cs" />
+    <Compile Include="ByteBuffer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

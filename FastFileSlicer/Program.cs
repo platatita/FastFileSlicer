@@ -23,22 +23,21 @@ namespace FastFileSlicer
 
             try
             {
-                string fileName = ReadFileName (args);
-                FileStreamSeekManager fileStreamSeekManager = new FileStreamSeekManager(0);
-                FilePortionReader fpr = new FilePortionReader(fileName, fileStreamSeekManager, -1, '\t');
-                fpr.Read();
+                string fileName = ReadFileName(args);
+                string algorithmType = ReadAlgorithm(args);
+                int bufferSize = ReadBufferSize(args);
 
-                return;
+                Console.WriteLine("File to slice:\t {0}", fileName);
+                Console.WriteLine("Algorithm type:\t {0}", algorithmType);
+                Console.WriteLine("Buffer size:\t   {0}", bufferSize);
 
-                foreach(string line in File.ReadLines (fileName))
+                if (string.IsNullOrWhiteSpace(algorithmType) || algorithmType == "simple")
                 {
-                    ProcessLine(line);
-
-                    if (LineCounter == ReportLineCount)
-                    {
-                        Console.WriteLine("{0} processed lines {1}", DateTime.Now.ToString("yyyyMMdd HH:mm:ss"), TotalLineCounter);
-                        LineCounter = 0;
-                    }
+                    ProcessBySimpleReader(fileName);
+                }
+                else
+                {
+                    ProcessByFilePortionReader(fileName, bufferSize);
                 }
             }
             catch(System.Exception ex) 
@@ -54,6 +53,40 @@ namespace FastFileSlicer
         private static string ReadFileName (string[] args)
         {
             return args [0] as string;
+        }
+
+        private static string ReadAlgorithm(string[] args)
+        {
+            return args.Length > 1 ? args[1] as string : string.Empty;
+        }
+
+        private static int ReadBufferSize(string[] args)
+        {
+            return args.Length > 2 ? Convert.ToInt32(args[2]) : 1024;
+        }
+
+        private static void ProcessByFilePortionReader(string fileName, int bufferSize)
+        {
+            Console.WriteLine("Processing by file portion reader");
+
+            FileStreamPositionManager fileStreamSeekManager = new FileStreamPositionManager(0);
+            FilePortionReader fpr = new FilePortionReader(fileName, bufferSize, fileStreamSeekManager, '\t');
+            fpr.Slice();
+        }
+
+        private static void ProcessBySimpleReader(string fileName)
+        {
+            Console.WriteLine("Processing by simple reader");
+
+            foreach (string line in File.ReadLines(fileName))
+            {
+                ProcessLine(line);
+                if (LineCounter == ReportLineCount)
+                {
+                    Console.WriteLine("{0} processed lines {1}", DateTime.Now.ToString("yyyyMMdd HH:mm:ss"), TotalLineCounter);
+                    LineCounter = 0;
+                }
+            }
         }
 
         private static void ProcessLine(string line)

@@ -6,24 +6,26 @@ using NUnit.Framework;
 namespace FastFileSlicer.UnitTests
 {
     [TestFixture]
-    public class FileStreamSeekManagerTests
+    public class FileStreamPositionManagerTests
     {
         private const string TestDirectory = "FileStreamSeekManagerTests";
         private const string TestFilePath = "FileStreamSeekManagerTests/test_file.txt";
         private FileStream fileStream;
-        private FileStreamSeekManager target;
+        private FastFileSlicer.StreamReader streamReader;
+        private FileStreamPositionManager target;
 
         [SetUp]
         public void Before_Each_Test()
         {
             Directory.CreateDirectory(TestDirectory);
             this.fileStream = new FileStream(TestFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+            this.streamReader = new StreamReader(fileStream, 1024);
         }
 
         [TearDown]
         public void After_Each_Test()
         {
-            this.fileStream.Dispose();
+            this.streamReader.Dispose();
             Directory.Delete(TestDirectory, true);
         }
 
@@ -31,22 +33,22 @@ namespace FastFileSlicer.UnitTests
         public void Does_Not_Change_FileStream_Position_When_StartByte_Equals_To_Zero()
         {
             long startByte = 0;
-            this.target = new FileStreamSeekManager(startByte);
-            var actual = this.target.Seek(this.fileStream);
+            this.target = new FileStreamPositionManager(startByte);
+            var actual = this.target.Seek(this.streamReader);
 
             Assert.IsFalse(actual);
-            Assert.AreEqual(0, this.fileStream.Position);
+            Assert.AreEqual(0, this.streamReader.Position);
         }
 
         [Test]
         public void Does_Not_Change_FileStream_Position_When_File_Is_Empty()
         {
             long startByte = 100;
-            this.target = new FileStreamSeekManager(startByte);
-            var actual = this.target.Seek(this.fileStream);
+            this.target = new FileStreamPositionManager(startByte);
+            var actual = this.target.Seek(this.streamReader);
 
             Assert.IsFalse(actual);
-            Assert.AreEqual(0, this.fileStream.Position);
+            Assert.AreEqual(0, this.streamReader.Position);
         }
 
         [Test]
@@ -55,11 +57,11 @@ namespace FastFileSlicer.UnitTests
             WriteLines(5);
 
             long startByte = 7;
-            this.target = new FileStreamSeekManager(startByte);
-            var actual = this.target.Seek(this.fileStream);
+            this.target = new FileStreamPositionManager(startByte);
+            var actual = this.target.Seek(this.streamReader);
 
             Assert.IsTrue(actual);
-            Assert.AreEqual(19, this.fileStream.Position);
+            Assert.AreEqual(19, this.streamReader.Position);
         }
 
         [Test]
@@ -68,11 +70,11 @@ namespace FastFileSlicer.UnitTests
             WriteLines(5);
 
             long startByte = 65;
-            this.target = new FileStreamSeekManager(startByte);
-            var actual = this.target.Seek(this.fileStream);
+            this.target = new FileStreamPositionManager(startByte);
+            var actual = this.target.Seek(this.streamReader);
 
             Assert.IsTrue(actual);
-            Assert.AreEqual(79, this.fileStream.Position);
+            Assert.AreEqual(79, this.streamReader.Position);
         }
 
         [Test]
@@ -81,11 +83,11 @@ namespace FastFileSlicer.UnitTests
             WriteLines(5);
 
             long startByte = 95;
-            this.target = new FileStreamSeekManager(startByte);
-            var actual = this.target.Seek(this.fileStream);
+            this.target = new FileStreamPositionManager(startByte);
+            var actual = this.target.Seek(this.streamReader);
 
             Assert.IsTrue(actual);
-            Assert.AreEqual(99, this.fileStream.Position);
+            Assert.AreEqual(99, this.streamReader.Position);
         }
 
         private void WriteLines(int lineCount)
