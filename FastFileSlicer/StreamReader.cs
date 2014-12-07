@@ -11,9 +11,10 @@ namespace FastFileSlicer
         private const int NotFoundIndex = -1;
 
         private readonly Stream stream;
-        private readonly byte[] buffer;
 
+        private int bufferSize;
         private ByteBuffer tmpByteBuffer;
+        private byte[] buffer;
 
         internal int StartBufferIndex { get; private set; }
         internal int ReadBytes { get; private set; }
@@ -24,8 +25,8 @@ namespace FastFileSlicer
         internal StreamReader(Stream stream, int bufferSize)
         {
             this.stream = stream;
-            this.buffer = new byte[bufferSize];
-            this.tmpByteBuffer = new ByteBuffer(bufferSize * 2);
+            this.bufferSize = bufferSize;
+            this.tmpByteBuffer = new ByteBuffer(bufferSize * 10);
         }
 
         #region IDisposable implementation
@@ -97,7 +98,7 @@ namespace FastFileSlicer
             return charIndexs;
         }
 
-        internal Tuple<int, int, byte[]> ReadBytesToChar(char charToFind, bool includeCharToFind = false)
+        internal List<Tuple<int, int, byte[]>> ReadBytesToChar(char charToFind, bool includeCharToFind = false)
         {
             this.tmpByteBuffer.Clear();
             var orgStartBufferIndex = this.StartBufferIndex;
@@ -122,17 +123,19 @@ namespace FastFileSlicer
                     this.tmpByteBuffer.AddRange(this.buffer, 0, index);
                 }
 
-                return new Tuple<int, int, byte[]>(0, this.tmpByteBuffer.Count, this.tmpByteBuffer.ToArray());
+                return this.tmpByteBuffer.ToArray();
             }
             else
             {
-                return new Tuple<int, int, byte[]>(orgStartBufferIndex, index - orgStartBufferIndex, this.buffer);
+                return new List<Tuple<int, int, byte[]>>() { new Tuple<int, int, byte[]>(orgStartBufferIndex, index - orgStartBufferIndex, this.buffer) };
             }
         }
 
         private int ReadFromStream()
         {
             this.StartBufferIndex = 0;
+            this.buffer = new byte[this.bufferSize];
+
             return this.ReadBytes = this.stream.Read(this.buffer, 0, this.buffer.Length);
         }
     }

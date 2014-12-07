@@ -14,6 +14,8 @@ namespace FastFileSlicer
 
         private static long LineCounter;
         private static long TotalLineCounter;
+        private static string directoryBasePath;
+        private static string fileExtension;
 
         public static void Main (string[] args)
         {
@@ -78,6 +80,9 @@ namespace FastFileSlicer
         {
             Console.WriteLine("Processing by simple reader");
 
+            fileExtension = Path.GetExtension(fileName);
+            directoryBasePath = Path.GetDirectoryName(fileName);
+
             foreach (string line in File.ReadLines(fileName))
             {
                 ProcessLine(line);
@@ -94,7 +99,8 @@ namespace FastFileSlicer
             Interlocked.Increment(ref LineCounter);
             Interlocked.Increment(ref TotalLineCounter);
 
-            string fileNameFromLine = ReadFileNameFromLine (line);
+            string fileNameFromLine = Path.Combine(directoryBasePath, string.Concat(ReadFileNameFromLine (line), fileExtension));
+
             using (FileStream fs = new FileStream(fileNameFromLine, FileMode.Append, FileAccess.Write, FileShare.ReadWrite)) 
             {
                 using (StreamWriter sw = new StreamWriter(fs)) 
@@ -113,8 +119,6 @@ namespace FastFileSlicer
                 char c = line [i];
                 if (c == '\t') 
                 {
-                    buildFileName.Append (".tcv");
-
                     return buildFileName.ToString ();
                 }
                 buildFileName.Append (c);

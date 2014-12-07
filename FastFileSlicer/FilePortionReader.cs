@@ -49,8 +49,8 @@ namespace FastFileSlicer
         {
             do
             {
-                Tuple<int, int, byte[]> fileNameBuffer = ReadFileNameBuffer();
-                if (fileNameBuffer.Item2 <= 0)
+                List<Tuple<int, int, byte[]>> fileNameBuffer = ReadFileNameBuffer();
+                if (fileNameBuffer.Count == 0 || fileNameBuffer[0].Item2 <= 0)
                 {
                     break;
                 }
@@ -58,35 +58,41 @@ namespace FastFileSlicer
                 string fileName = GetSliceFileName(fileNameBuffer);
                 StoreDataIntoFile(fileName, fileNameBuffer);
 
-                Tuple<int, int, byte[]> dataBuffer = ReadDataBufferToEndOfLine();
+                List<Tuple<int, int, byte[]>> dataBuffer = ReadDataBufferToEndOfLine();
                 StoreDataIntoFile(fileName, dataBuffer);
 
             } while(this.streamReader.ReadBytes > 0);
         }
 
-        private Tuple<int, int, byte[]> ReadFileNameBuffer()
+        private List<Tuple<int, int, byte[]>> ReadFileNameBuffer()
         {
             return this.streamReader.ReadBytesToChar(this.columnSeparator);
         }
 
-        private string GetSliceFileName(Tuple<int, int, byte[]> fileNameBuffer)
+        private string GetSliceFileName(List<Tuple<int, int, byte[]>> fileNameBuffer)
         {
-            var fileName = Encoding.UTF8.GetString(fileNameBuffer.Item3, fileNameBuffer.Item1, fileNameBuffer.Item2);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < fileNameBuffer.Count; i++)
+            {
+                sb.Append(Encoding.UTF8.GetString(fileNameBuffer[i].Item3, fileNameBuffer[i].Item1, fileNameBuffer[i].Item2));
+            }
 
-            return Path.Combine(this.directoryBasePath, string.Concat(fileName, this.fileExtension));
+            return Path.Combine(this.directoryBasePath, string.Concat(sb.ToString(), this.fileExtension));
         }
 
-        private Tuple<int, int, byte[]> ReadDataBufferToEndOfLine()
+        private List<Tuple<int, int, byte[]>> ReadDataBufferToEndOfLine()
         {
             return this.streamReader.ReadBytesToChar(Environment.NewLine[0], true);
         }
 
-        private void StoreDataIntoFile(string fileName, Tuple<int, int, byte[]> data)
+        private void StoreDataIntoFile(string fileName, List<Tuple<int, int, byte[]>> data)
         {
             using (FileStream fs = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Write))
             {
-                fs.Write(data.Item3, data.Item1, data.Item2);
-                fs.Flush();
+                for (int i = 0; i < data.Count; i++)
+                {
+                    fs.Write(data[i].Item3, data[i].Item1, data[i].Item2);
+                }
             }
         }
     }
